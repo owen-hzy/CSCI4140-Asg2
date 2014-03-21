@@ -1,6 +1,6 @@
-<?
-foreach(var $i in $_ENV)
+<?php
+foreach($_ENV as $key => $value)
 {
-	echo $i . " = " . $_ENV[$i] . "\n";
+	echo $key . " = " . $value . "\n";
 }
 ?>
