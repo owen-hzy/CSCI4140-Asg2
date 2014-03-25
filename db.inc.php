@@ -22,4 +22,5 @@ function db_connect($db_name) {
 	return $db;
 }
 
+db_connect('asg2');
 ?>
