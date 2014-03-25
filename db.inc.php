@@ -21,3 +21,5 @@ function db_connect($db_name) {
 	
 	return $db;
 }
+
+?>
