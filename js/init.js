@@ -111,6 +111,7 @@ function handleReaderLoadEnd(e)
 		{
 			var percent = parseInt((e.loaded/e.total) * 100);
 			$("filedrag").style.backgroundSize = percent + "% auto";
+			$("filedrag").innerHTML = percent + "%";
 		},
 		false);
 	
