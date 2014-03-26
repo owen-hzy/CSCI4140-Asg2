@@ -1,9 +1,4 @@
 // Define some helper method
-function $(id)
-{
-	return document.getElementById(id);
-}
-
 function Output(msg)
 {
 	var m = $("messages");
@@ -99,21 +94,7 @@ function handleReaderLoadEnd(e)
 {
 	var data = e.target.result.split(',')[1];
 	var file_name = e.target.file_name;
-	var xhr = new_request();
-	if (xhr.upload)
-		{
-			xhr.open("POST", "upload.php", true);
-			xhr.setRequestHeader("FILE_NAME", file_name);
-			xhr.send(data);
-		}
-	
-	xhr.upload.addEventListener("progress", function(e)
-		{
-			var percent = parseInt((e.loaded/e.total) * 100);
-			$("filedrag").style.backgroundSize = percent + "% auto";
-			$("filedrag").innerHTML = percent + "%";
-		},
-		false);
-	
+
+	myLib.upload(data, null, file_name);
 }
 
