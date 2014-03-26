@@ -96,6 +96,9 @@ body {
 	border: 2px dashed #555;
 	border-radius: 20px;
 	cursor: default;
+	background-image: url(./progress.png);
+	background-repeat: repeat-y;
+	background-size: 0% auto;
 }
 #filedrag.hover {
 	color: #f00;

@@ -90,7 +90,7 @@ function FileSelectHandler(e)
 	
 	if (file.size > $("MAX_FILE_SIZE").value)
 		{
-			window.alert(file.name + " is too large! File size should be less than " + $("MAX_FILE_SIZE") + " bytes.");
+			window.alert(file.name + " is too large! File size should be less than " + $("MAX_FILE_SIZE").value + " bytes.");
 		}
 		
 }
@@ -110,8 +110,7 @@ function handleReaderLoadEnd(e)
 	xhr.upload.addEventListener("progress", function(e)
 		{
 			var percent = parseInt((e.loaded/e.total) * 100);
-			$("filedrag").style.backgroundColor = "#0C0";
-			$("filedrag").style.backgroundPosition = pc + "% 0";
+			$("filedrag").style.backgroundSize = percent + "% auto";
 		},
 		false);
 	
