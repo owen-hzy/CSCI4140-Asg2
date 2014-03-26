@@ -9,10 +9,6 @@ function db_connect($db_name) {
 	// Connect to database, construct the info 
 	$db_info = 'mysql:host=' . $db_host . ';port=' . $db_port . ';dbname=' . $db_name . ';';
 	$db = new PDO($db_info, $db_username, $db_password);
-	if (!is_null($db))
-	{
-		echo 'Connected!';
-	}
 	
 	// set some attribute
 	$db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
@@ -22,5 +18,4 @@ function db_connect($db_name) {
 	return $db;
 }
 
-db_connect('asg2');
 ?>

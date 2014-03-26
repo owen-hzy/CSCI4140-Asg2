@@ -1,0 +1,105 @@
+@charset "UTF-8";
+#top {
+	overflow: hidden;
+}
+#bottom {
+	clear: both;
+	text-align: center;
+}
+body {
+	background-color: #EFF5F8;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
+}
+#wrapper {
+	margin-left: auto;
+	margin-right: auto;
+	width: 100%;
+	min-width: 740px;
+	max-width: 1000px;
+	background-color: #FFFFFF;
+}
+#top h1 {
+	color: #3399CC;
+	text-align: center;
+	text-transform: uppercase;
+	font-family: Impact, Haettenschweiler, "Franklin Gothic Bold", "Arial Black", sans-serif;
+	font-style: normal;
+	font-size: 100px;
+}
+#main ul {
+	list-style-type: none;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+	width: 100%;
+	float: left;
+}
+#main ul li img  {
+	width: 100%;
+	float: left;
+}
+#main ul li img:hover , #main .delete:hover, #main .edit:hover{
+	border: 2px solid #3399CC;
+}
+#main {
+	width: 95%;
+	margin-left: 2%;
+	margin-right: 2%;
+	float: left;
+}
+#main ul li {
+	float: left;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+	display: block;
+	margin-top: 5px;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	margin-left: 5px;
+	width: 23%;
+	position: relative;
+}
+#main ul li:nth-child(5) {
+	clear: left;
+}
+#main {
+}
+#main .edit {
+	display: block;
+	position: absolute;
+	top: 5px;
+	right: 25px;
+}
+#main .delete {
+	position: absolute;
+	top: 5px;
+	right: 10px;
+}
+#filedrag {
+	width: 100%;
+	display: none;
+	font-weight: bold;
+	text-align: center;
+	padding: 1em 0;
+	margin: 1em 0;
+	color: #555;
+	border: 2px dashed #555;
+	border-radius: 20px;
+	cursor: default;
+}
+#filedrag.hover {
+	color: #f00;
+	border-color: #f00;
+	border-style: solid;
+	box-shadow: inset 0 3px 4px #888;
+}
