@@ -102,8 +102,14 @@ window.$ = function(id)
 		opt = opt || {};
 		opt.url = url || "process.php";
 		opt.method = opt.method || 'GET';
-		if (param)
-			opt.data = param;
+		if (param  && opt.upload && opt.upload == "TRUE")
+			{
+				opt.data = param;
+				opt.url = "process.php?action=upload";
+			}
+				
+		else if (param)
+			opt.data = encodeParam(param);
 		opt.success = function(json)
 		{
 			json = JSON.parse(json);
