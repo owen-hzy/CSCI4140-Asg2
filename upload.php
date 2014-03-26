@@ -9,7 +9,7 @@
 		$result = file_put_contents($upload_dir . '' . $fn, $data);
 		if ($data)
 		{
-			echo "uploaded!" . $upload_dir . '/' . $fn;
+			echo "uploaded!" . $upload_dir . '' . $fn;
 		}
 	}
 	exit();
