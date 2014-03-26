@@ -17,7 +17,7 @@ function upload()
 		$name = $name_extension[0];
 		$extension = $name_extension[1]; 
 		$thumbname = $name . "_thumb." . $extension;
-		$up_time = system("/bin/date +%s");
+		$up_time = time();
 		
 		// Put the file into a directory and return the size if succeed
 		$result = file_put_contents($image_dir, $data);

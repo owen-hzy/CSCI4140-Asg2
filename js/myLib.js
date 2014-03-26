@@ -74,14 +74,14 @@ window.$ = function(id)
 				xhr.upload.addEventListener("load", function(e)
 						{	
 						$("filedrag").style.backgroundSize = "0% auto";
-						$("filedrag").innerHTML = "Drag Files Here";
+						$("filedrag").innerHTML = "Drop Files Here";
 						},
 						false);
 			
 				xhr.upload.addEventListener("error", function(e)
 						{
 						$("filedrag").style.backgroundSize = "0% auto";
-						$("filedrag").innerHTML = "Drag Files Here";
+						$("filedrag").innerHTML = "Drop Files Here";
 						window.alert("Error Occured While Uploading: " + e.Message);
 						},
 						false);	
@@ -110,9 +110,9 @@ window.$ = function(id)
 				
 		else if (param)
 			opt.data = encodeParam(param);
-		opt.success = function(json)
-		{
-			json = JSON.parse(json);
+		
+		opt.success = function(json){
+			var json = JSON.parse(json);
 			if (json.success)
 				successCallback && successCallback.call(this, json.success);
 			else
