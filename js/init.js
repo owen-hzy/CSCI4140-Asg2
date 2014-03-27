@@ -122,7 +122,7 @@ function enlarge_photo(e)
 	var v = $("view");
 	var img = document.createElement("img");
 	img.src = "data/" + name;
-	img.style.margin = "0px 0px;";
+	img.style.margin = "0px 0px";
 	img.id = "pic";
 	img.addEventListener("load", function()
 		{
@@ -135,8 +135,8 @@ function enlarge_photo(e)
 			v.className = "";
 		},
 		false);
-	c.appendChild(img);
-	
+	if (! c.hasChildNode)
+		c.appendChild(img);
 }
 
 function edit_photo(e)
