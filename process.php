@@ -2,12 +2,13 @@
 error_reporting(E_ALL); ini_set('display_errors', 1);
 
 require_once 'db.inc.php';
+$upload_dir = (isset($_ENV['OPENSHIFT_DATA_DIR']) ? $_ENV['OPENSHIFT_DATA_DIR'] : "/var/www/asg2/data/");
 
 function upload()
 {
 	$fn = (isset($_SERVER['HTTP_FILE_NAME']) ? $_SERVER['HTTP_FILE_NAME'] : false);
 	$MAX_FILE_SIZE = 1000000;
-	$upload_dir = (isset($_ENV['OPENSHIFT_DATA_DIR']) ? $_ENV['OPENSHIFT_DATA_DIR'] : "/var/www/asg2/data/");
+	global $upload_dir;
 	if ($fn && $upload_dir)
 	{
 		$raw_data = file_get_contents('php://input');
@@ -45,7 +46,7 @@ function upload()
 					throw new PDOException("ERROR_UPLOAD_UPDATE");
 				}
 			}
-			return $fn;
+			return true;
 		}
 		else 
 		{
@@ -66,6 +67,54 @@ function check_duplicate($filename)
 	$r = $q->fetch();
 	return $r["COUNT(*)"];
 }
+
+function photo_fetchall()
+{
+	global $db;
+	$db = db_connect("asg2");
+	
+	$q = $db->prepare("SELECT * FROM photos ORDER BY upload_time DESC");
+	if (! $q->execute())
+		throw new PDOException("ERROR FETCHALL");
+	return $q->fetchAll();
+}
+
+function photo_delete()
+{
+	$name = $_POST['name'];
+	$name_extension = explode(".", $name);
+	$thumb = $name_extension[0];
+	$extension = $name_extension[1];
+	$thumbname = $thumb . "_thumb." . $extension;
+	
+	global $db, $upload_dir;
+	$db = db_connect("asg2");
+	
+	$q = $db->prepare("DELETE FROM photos WHERE name=(:name)");
+	if (! $q->execute(array(":name" => $name)))
+		throw new PDOException("ERROR DELETE");
+	
+	system('/bin/rm -f ' . $upload_dir . $name);
+	system('/bin/rm -f ' . $upload_dir . $thumbname);
+	
+	return true;
+}
+
+function photo_edit()
+{
+	$name = $_POST['name'];
+	$description = $_POST['description'];
+	
+	global $db;
+	$db = db_connect("asg2");
+	
+	$q = $db->prepare("UPDATE photos SET description=(:description) WHERE name=(:name)");
+	if (! $q->execute(array(":description" => $description, ":name" => $name)))
+		throw new PDOException("ERROR UPDATE");
+	
+	return array("name" => $name, "description" => $description);
+}
+
 
 header("Content-Type: application/json");
 try {

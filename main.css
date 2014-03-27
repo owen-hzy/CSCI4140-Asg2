@@ -12,6 +12,8 @@ body {
 	margin-right: 0px;
 	margin-bottom: 0px;
 	margin-left: 0px;
+	width: 100%;
+	height: 100%;
 }
 #wrapper {
 	margin-left: auto;
@@ -45,9 +47,16 @@ body {
 #main ul li img  {
 	width: 100%;
 	float: left;
+	border: 2px solid #fff;
 }
 #main ul li img:hover , #main .delete:hover, #main .edit:hover{
 	border: 2px solid #3399CC;
+	cursor: pointer;
+}
+#main .delete, #main .edit
+{
+	border: 2px solid #fff;
+	background-color: #fff;
 }
 #main {
 	width: 95%;
@@ -69,8 +78,11 @@ body {
 	width: 23%;
 	position: relative;
 }
-#main ul li:nth-child(5) {
+#main ul li:nth-child(4n+1) {
 	clear: left;
+}
+#main ul li img {
+	height: 150px;
 }
 #main {
 }
@@ -99,10 +111,66 @@ body {
 	background-image: url(./progress.png);
 	background-repeat: repeat-y;
 	background-size: 0% auto;
+	clear: both;
 }
 #filedrag.hover {
 	color: #f00;
 	border-color: #f00;
 	border-style: solid;
 	box-shadow: inset 0 3px 4px #888;
+}#view {
+	width: 100%;
+	position: fixed;
+	height: 100%;
+	top: 0px;
+}
+.hide {
+	display: none;
+}
+#mask {
+	width: 100%;
+	height: 100%;
+	background-color: #ccc;
+	opacity: 0.7;
+}
+#photo {
+	position: absolute;
+	margin-left: auto;
+	top: 0px;
+	background-color: #3399CC;
+	margin-right: auto;
+	border: 5px solid #FFFFFF;
+	border-radius: 20px;
+}
+#c11 {
+	width: 10px;
+	height: 10px;
+	cursor: nw-resize;
+}
+#c13 {
+	width: 10px;
+	height: 10px;
+	cursor: ne-resize;
+}
+#c12 {
+	cursor: n-resize;
+}
+#c21 {
+	cursor: w-resize;
+}
+#c23 {
+	cursor: e-resize;
+}
+#c31 {
+	width: 10px;
+	height: 10px;
+	cursor: sw-resize;
+}
+#c33 {
+	width: 10px;
+	height: 10px;
+	cursor: se-resize;
+}
+#c32 {
+	cursor: s-resize;
 }

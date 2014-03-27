@@ -35,7 +35,7 @@ window.$ = function(id)
 					: new ActiveXObject("Microsoft.XMLHTTP"),
 			async = opt.async !== false,
 			success = opt.success || null,
-			error = opt.error || function(){ alert('AJAX Error: ' + this.status)};
+			error = opt.error || function(){ alert('AJAX Error: ' + this.status);};
 			
 		// pass three parameters to xhr.open
 		xhr.open(opt.method || 'GET', opt.url || '', async);
@@ -53,14 +53,18 @@ window.$ = function(id)
 		if (async)
 			xhr.onreadystatechange = function()
 			{
-				var status = xhr.status, response = xhr.responseText;
-				if (status == 200 || status == 304)
+				if (xhr.readyState == 4)
 					{
-						success && success.call(xhr, response);
+					var status = xhr.status, response = xhr.responseText;
+					if (status == 200 || status == 304)
+						{
+							success && success.call(xhr, response);
+						}
+					else if (status >= 500)
+						error.call(xhr);
 					}
-				else if (status >= 500)
-					error.call(xhr);
-			}
+			};
+					
 		if (xhr.upload && opt.upload && opt.upload == "TRUE")
 			{
 				xhr.upload.addEventListener("progress", function(e)
@@ -92,11 +96,10 @@ window.$ = function(id)
 		xhr.send(opt.data || null);
 		
 		// Synchronous Call blocks UI and returns result immediately after xhr.send
-		!async && callback && callback.call(xhr, xhr.responseText);
+		!async && success && success.call(xhr, xhr.responseText);
 			
 	};
 	
-
 	myLib.processJSON = function(url, param, successCallback, opt)
 	{
 		opt = opt || {};
@@ -105,14 +108,13 @@ window.$ = function(id)
 		if (param  && opt.upload && opt.upload == "TRUE")
 			{
 				opt.data = param;
-				opt.url = "process.php?action=upload";
-			}
-				
+				opt.url += "&action=upload";
+			}		
 		else if (param)
 			opt.data = encodeParam(param);
 		
 		opt.success = function(json){
-			var json = JSON.parse(json);
+			var json = window.JSON.parse(json);
 			if (json.success)
 				successCallback && successCallback.call(this, json.success);
 			else
@@ -120,13 +122,12 @@ window.$ = function(id)
 		};
 		myLib.ajax(opt);
 	};
-	
 
 	myLib.get = function(param, successCallback)
 	{
 		param = param || {};
 		param.rnd = new Date().getTime(); // to avoid caching 
-		myLib.processJSON("process.php?rnd=" + encodeParam(param), null, successCallback);
+		myLib.processJSON("process.php?" + encodeParam(param), null, successCallback);
 	};
 	
 	myLib.upload = function(param, successCallback, filename)
@@ -143,10 +144,6 @@ window.$ = function(id)
 	myLib.post = function(param, successCallback)
 	{
 		myLib.processJSON('process.php?rnd=' + new Date().getTime(), param, successCallback, {"method" : "POST"});
-	}
-	
-	
-	
-	
-	
+	};
 })();
+	
