@@ -135,7 +135,7 @@ function enlarge_photo(e)
 			v.className = "";
 		},
 		false);
-	if (! c.hasChildNodes)
+	if (! c.hasChildNodes())
 		c.appendChild(img);
 }
 
