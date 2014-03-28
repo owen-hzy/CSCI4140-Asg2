@@ -49,10 +49,6 @@ body {
 	float: left;
 	border: 2px solid #fff;
 }
-#main ul li img:hover , #main .delete:hover, #main .edit:hover{
-	border: 2px solid #3399CC;
-	cursor: pointer;
-}
 #main .delete, #main .edit
 {
 	border: 2px solid #fff;
@@ -84,18 +80,9 @@ body {
 #main ul li img {
 	height: 150px;
 }
-#main {
-}
-#main .edit {
-	display: block;
+#main .delete, #main .edit {
 	position: absolute;
-	top: 5px;
-	right: 25px;
-}
-#main .delete {
-	position: absolute;
-	top: 5px;
-	right: 10px;
+	display: none;
 }
 #filedrag {
 	width: 100%;

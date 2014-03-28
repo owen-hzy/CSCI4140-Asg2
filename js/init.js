@@ -1,8 +1,8 @@
 // call initialization file
-if (window.File && window.FileList && window.FileReader)
-{
-	Init();
-}
+window.addEventListener("load", Init, false);
+
+var dx, dy, h, w, rx, ry, th, tw, temp;
+var rs = null;
 
 // Initialize
 function Init()
@@ -20,7 +20,181 @@ function Init()
 			filedrag.style.display = "block";
 		}
 	$("mask").addEventListener("click", disappear, false);
+	$("pe").addEventListener("mouseover", mouseOver, false);
+	$("pe").addEventListener("mouseout", mouseOut, false);
+	$("px").addEventListener("mouseover", mouseOver, false);
+	$("px").addEventListener("mouseout", mouseOut, false);
+	$("pe").addEventListener("click", edit_photo, false);
+	$("px").addEventListener("click", remove_photo, false);
+	
+	var view = $("view");
+	view.addEventListener("mousedown", mouseDown, false);
+	view.addEventListener("mouseup", mouseUp, false);
+	view.addEventListener("mousemove", mouseMove, false);
+	document.addEventListener("mouseout", function(e){ rs = null;}, false);
+	document.body.addEventListener("mouseout", function(e){
+		e.stopPropagation();}, false);
+	
 }
+
+function mouseDown(e)
+{
+	e.preventDefault();
+	var t = e.target;
+	var dd = $("photo");
+	dx = dd.offsetLeft - e.clientX;
+	dy = dd.offsetTop - e.clientY;
+	rx = e.clientX;
+	ry = e.clientY;
+	var timg = $("pic");
+	h = timg.height;
+	w = timg.width;
+	
+	if (t.id == "pic")
+		{
+			rs = "1";
+		}
+	if (t.id == "c11")
+		{
+			rs = "2";
+			th = ry + h;
+			tw = rx + w;
+		}
+	if (t.id == "c12")
+		{
+			rs = "3";
+			th = ry + h;
+			tw = rx + w;
+		}
+	if (t.id == "c13")
+		{
+			rs = "4";
+			th = ry + h;
+			tw = rx - w;
+		}
+	if (t.id == "c21")
+		{
+			rs = "5";
+			tw = rx + w;
+		}
+	if (t.id == "c23")
+		{
+			rs = "6";
+			tw = rx - w;
+		}
+	if (t.id == "c31")
+		{
+			rs = "7";
+			th = ry - h;
+			tw = rx + w;
+		}
+	if (t.id == "c32")
+		{
+			rs = "8";
+			th = ry - h;
+		}
+	if (t.id == "c33")
+		{
+			rs = "9";
+			th = ry - h;
+			tw = rx - w;
+		}
+}
+
+function mouseMove(e)
+{
+	var t = e.target;
+	var dd = $("photo");
+	var timg = $("pic");
+	
+	if (rs == "1")
+		{
+			dd.style.left = e.clientX + dx + "px";
+			if (dd.offsetLeft < 0) 
+				dd.style.left = "0px";
+			if (dd.offsetLeft + dd.clientWidth + 30 >= window.innerWidth)
+				dd.style.left = window.innerWidth - dd.clientWidth -30 + "px";
+				
+			dd.style.top = e.clientY + dy + "px";
+			if (dd.offsetTop < 0)
+				dd.style.top = "0px";
+			if (dd.offsetTop + dd.clientHeight + 10 >= window.innerHeight)
+				dd.style.top = window.innerHeight - dd.clientHeight - 10 + "px";
+		}
+	if (rs == "2")
+		{
+			if (e.clientX <= tw)
+				{
+					dd.style.left = e.clientX + dx + "px";
+					timg.width = w - (e.clientX - rx);
+				}
+			if (e.clientY <= th)
+				{
+					dd.style.top = e.clientY + dy + "px";
+					timg.height = h - (e.clientY - ry);
+				}
+		}
+	if (rs == "3" && e.clientY <= th)
+		{
+			dd.style.top = e.clientY + dy + "px";
+			timg.height = h - (e.clientY - ry);
+			timg.width = w;
+		}
+	if (rs == "4")
+		{
+			if (e.clientY <= th)
+			{	
+				dd.style.top = e.clientY + dy + "px";
+				timg.height = h - (e.clientY - ry);
+			}
+			if (e.clientX >= tw)
+				timg.width = w + (e.clientX - rx);		
+		}
+	if (rs == "5" && e.clientX <= tw)
+		{
+			dd.style.left = e.clientX + dx + "px";
+			timg.width = w - (e.clientX - rx);
+			timg.height = h;
+		}
+	if (rs == "6" && e.clientX >= tw)
+		{
+			timg.width = w + (e.clientX - rx);
+			timg.height = h;
+		}
+	if (rs == "7")
+		{
+			if (e.clientX <= tw)
+			{	
+				dd.style.left = e.clientX + dx + "px";
+				timg.width = w - (e.clientX - rx);
+			}
+			if (e.clientY >= th)
+				timg.height = h + (e.clientY - ry);
+		}
+	if (rs == "8" && e.clientY >= th)
+		{
+			timg.height = h + (e.clientY - ry);
+			timg.width = w;
+		}
+	if (rs == "9")
+		{
+			if (e.clientX >= tw)
+				timg.width = w + (e.clientX - rx);
+			if (e.clientY >= th)
+				timg.height = h + (e.clientY - ry);
+		}
+}
+
+function mouseUp(e)
+{
+	e.preventDefault();
+	e.stopPropagation();
+	rs = null;
+}
+
+
+
+
 
 function disappear()
 {
@@ -58,12 +232,10 @@ function FileSelectHandler(e)
 			reader.readAsDataURL(file);
 			reader.file_name = file.name;
 		}
-	
-	if (file.size > $("MAX_FILE_SIZE").value)
+	else
 		{
-			window.alert(file.name + " is too large! File size should be less than " + $("MAX_FILE_SIZE").value + " bytes.");
-		}
-		
+			window.alert("FileSize or FileType is not correct!");
+		}		
 }
 
 function handleReaderLoadEnd(e)
@@ -79,7 +251,7 @@ function update(data)
 	$("photoList").innerHTML = "";
 	myLib.get({"action" : "photo_fetchall"}, function(json)
 		{
-			var li = [], img = [], edit = [], remove = [];
+			var li = [], img = [];
 			for (var i = 0, pic; pic = json[i]; i++)
 				{
 					// create li node
@@ -89,33 +261,99 @@ function update(data)
 					// create img and button node
 					img[i] = document.createElement("img");
 					img[i].src = "data/" + pic.thumb_name;
+					img[i].className = "thumbnail";
+					img[i].style.zIndex = "1";
+					img[i].name = pic.name;
 					if (pic.description)
 						img[i].title = pic.description;
-					
-					edit[i] = document.createElement("span");
-					edit[i].innerHTML = "E";
-					edit[i].className = "edit";
-					
-					remove[i] = document.createElement("span");
-					remove[i].innerHTML = "X";
-					remove[i].className = "delete";
+					img[i].addEventListener("mouseover", mouseOver, false);
+					img[i].addEventListener("mouseout", mouseOut, false);
 					
 					li[i].appendChild(img[i]);
-					li[i].appendChild(edit[i]);
-					li[i].appendChild(remove[i]);
 
 					$("photoList").appendChild(li[i]);
 
 					img[i].addEventListener("click", enlarge_photo, false);
-					edit[i].addEventListener("click", edit_photo, false);
-					remove[i].addEventListener("click", remove_photo, false);
 				}
 		});
 }
 update();
 
+function getPX(e)
+{
+	var x = 0;
+	while(e)
+		{
+		 	x += e.offsetLeft;
+		 	e = e.offsetParent;
+		}
+	return x;
+}
+
+function getPY(e)
+{
+	var y = 0;
+	while(e)
+		{
+			y += e.offsetTop;
+			e = e.offsetParent;
+		}
+		
+	return y;
+}
+
+
+
+function mouseOver(e)
+{
+	e.stopPropagation();
+	e.preventDefault();
+	var t = e.target;
+	if ((t.id != "pe") && (t.id != "px"))
+		{
+			var pe = $("pe");
+			var px = $("px");
+			pe.style.left = getPX(t) + t.clientWidth - 40 + "px";
+			pe.style.top = getPY(t) + "px";
+			pe.style.display = "block";
+			px.style.left = getPX(t) + t.clientWidth - 15 + "px";
+			px.style.top = getPY(t) + "px";
+			px.style.display = "block";
+			t.style.border = "2px solid #3399CC";
+			temp = t;
+		}
+	if ((t.id == "pe") || (t.id == "px"))
+		{
+			var pe = $("pe");
+			var px = $("px");
+			pe.style.display = "block";
+			px.style.display = "block";
+		}
+}
+
+function mouseOut(e)
+{
+	e.stopPropagation();
+	e.preventDefault();
+	var t = e.target;
+	if ((t.id != "pe") && (t.id != "px"))
+		{
+			t.style.border = "2px solid #fff";
+			$("pe").style.display = "none";
+			$("px").style.display = "none";
+		}
+	if ((t.id == "pe") || (t.id == "px"))
+		{
+			$("pe").style.display = "none";
+			$("px").style.display = "none";
+		}
+}
+
+
 function enlarge_photo(e)
 {
+	$("pe").style.display = "none";
+	$("px").style.display = "none";
 	var name = e.target.parentNode.id;
 	var c = $("c22");
 	var p = $("photo");
@@ -124,6 +362,7 @@ function enlarge_photo(e)
 	img.src = "data/" + name;
 	img.style.margin = "0px 0px";
 	img.id = "pic";
+	img.style.margin = "0px 0px";
 	img.addEventListener("load", function()
 		{
 			img.width = window.innerWidth * 0.6;
@@ -141,12 +380,12 @@ function enlarge_photo(e)
 
 function edit_photo(e)
 {
-	var id = e.target.parentNode.id;
-	var description = window.prompt("Please Enter the description for " + id);
-	(description != null) && myLib.post({"action" : "photo_edit", "name" : id, "description" : description}, function(json)
+	var description = window.prompt("Please Enter the description for " + temp.name, "Enter description here...");
+	(description != null) && myLib.post({"action" : "photo_edit", "name" : temp.name, "description" : description}, function(json)
 		{
-			$(id).getElementsByTagName("img")[0].title = json.description;
-			console.log("Changed the descrription of " + id + " to " + json.description);
+			temp.title = json.description;
+			
+			console.log("Changed the descrription of " + temp.name + " to " + json.description);
 		});
 		
 	return false;
@@ -154,12 +393,11 @@ function edit_photo(e)
 
 function remove_photo(e)
 {
-	var id = e.target.parentNode.id;
-	window.confirm("Delete photo: " + id + " \nConfirm?") && myLib.post({"action" : "photo_delete", "name" : id}, function(json)
+	window.confirm("Delete photo: " + temp.name + " \nConfirm?") && myLib.post({"action" : "photo_delete", "name" : temp.name}, function(json)
 		{
 			if (json == true)
 				{
-					console.log('"' + id + '" is deleted successfully!');
+					console.log('"' + temp.name + '" is deleted successfully!');
 					update();
 				}
 			else
@@ -170,39 +408,5 @@ function remove_photo(e)
 		
 	return false;
 }
-
-/* function drag(target, event)
-{
-	var startX = event.clientX;
-	var startY = event.clientY;
-	var origX = target.offsetLeft;
-	var origY = target.offsetTop;
-	var deltaX = startX - origX;
-	var deltaY = startY - origY;
-	
-	target.addEventListener("mousemove", moveHandler, false);
-	target.addEventListener("mouseup", upHandler, false);
-	
-	event.stopPropagation();
-	event.preventDefault();
-
-	function moveHandler(e)
-	{
-		if (!e) 
-			e = window.event;
-		target.style.left = (e.clientX - deltaX) + "px";
-		target.style.top = (e.clientY - deltaX) + "px";
-		e.stopPropagation();
-	}
-
-	function upHandler(e)
-	{
-		if (!e)
-			e = window.event;
-		target.removeEventListener("mouseup", upHandler, false);
-		target.removeEventListener("mousemove", moveHandler, false);
-	}
-}
-*/
 
 
