@@ -2,11 +2,12 @@
 window.addEventListener("load", Init, false);
 
 var dx, dy, h, w, rx, ry, th, tw, temp;
-var rs = null;
+var rs = null, idle = true, change = null;
 
 // Initialize
 function Init()
 {
+	update();
 	var filedrag = $("filedrag");
 	
 	var xhr = (window.XMLHttpRequest)
@@ -34,8 +35,27 @@ function Init()
 	document.addEventListener("mouseout", function(e){ rs = null;}, false);
 	document.body.addEventListener("mouseout", function(e){
 		e.stopPropagation();}, false);
-	
+
+	var periodic = setInterval(function()
+		{
+			if ($("on").checked && idle == true)
+				{
+					check();
+				}				
+		}, 3000);	
+}	
+
+function check()
+{
+	myLib.get({"action" : "photo_fetchall"}, function(json)
+		{
+			if (JSON.stringify(json) !== JSON.stringify(change))
+				display(json);
+			change = json;
+		});
 }
+
+
 
 function mouseDown(e)
 {
@@ -203,6 +223,9 @@ function disappear()
 	var img = $("pic");
 	c.removeChild(img);
 	v.className = "hide";
+	window.removeEventListener("DOMMouseScroll", prevent, false);
+	window.removeEventListener("mousewheel", prevent, false);
+	idle = true;
 }
 
 // file drag hover
@@ -219,6 +242,7 @@ function FileSelectHandler(e)
 	// cancel event and hover style
 	FileDragHover(e);
 	
+	idle = false;
 	// fetch FileList object
 	var file = e.dataTransfer.files[0];
 	
@@ -240,10 +264,41 @@ function FileSelectHandler(e)
 
 function handleReaderLoadEnd(e)
 {
+	idle = true;
 	var data = e.target.result.split(',')[1];
 	var file_name = e.target.file_name;
-
+	
 	myLib.upload(data, update, file_name);
+}
+
+function display(json)
+{
+	console.log("display");
+	var li = [], img = [];
+	$("photoList").innerHTML = "";
+	for (var i = 0, pic; pic = json[i]; i++)
+		{
+			// create li node
+			li[i] = document.createElement("li");
+			li[i].id = pic.name;
+			
+			// create img and button node
+			img[i] = document.createElement("img");
+			img[i].src = "data/" + pic.thumb_name;
+			img[i].className = "thumbnail";
+			img[i].style.zIndex = "1";
+			img[i].name = pic.name;
+			if (pic.description)
+				img[i].title = pic.description;
+			img[i].addEventListener("mouseover", mouseOver, false);
+			img[i].addEventListener("mouseout", mouseOut, false);
+			
+			li[i].appendChild(img[i]);
+
+			$("photoList").appendChild(li[i]);
+
+			img[i].addEventListener("click", enlarge_photo, false);
+		}
 }
 
 function update(data)
@@ -251,33 +306,12 @@ function update(data)
 	$("photoList").innerHTML = "";
 	myLib.get({"action" : "photo_fetchall"}, function(json)
 		{
-			var li = [], img = [];
-			for (var i = 0, pic; pic = json[i]; i++)
-				{
-					// create li node
-					li[i] = document.createElement("li");
-					li[i].id = pic.name;
-					
-					// create img and button node
-					img[i] = document.createElement("img");
-					img[i].src = "data/" + pic.thumb_name;
-					img[i].className = "thumbnail";
-					img[i].style.zIndex = "1";
-					img[i].name = pic.name;
-					if (pic.description)
-						img[i].title = pic.description;
-					img[i].addEventListener("mouseover", mouseOver, false);
-					img[i].addEventListener("mouseout", mouseOut, false);
-					
-					li[i].appendChild(img[i]);
-
-					$("photoList").appendChild(li[i]);
-
-					img[i].addEventListener("click", enlarge_photo, false);
-				}
+			display(json);
+			change = json;
 		});
 }
-update();
+
+
 
 function getPX(e)
 {
@@ -308,6 +342,7 @@ function mouseOver(e)
 {
 	e.stopPropagation();
 	e.preventDefault();
+	idle = false;
 	var t = e.target;
 	if ((t.id != "pe") && (t.id != "px"))
 		{
@@ -324,6 +359,7 @@ function mouseOver(e)
 		}
 	if ((t.id == "pe") || (t.id == "px"))
 		{
+			temp.style.border = "2px solid #3399CC";
 			var pe = $("pe");
 			var px = $("px");
 			pe.style.display = "block";
@@ -335,6 +371,8 @@ function mouseOut(e)
 {
 	e.stopPropagation();
 	e.preventDefault();
+	if ($("pic") == null)
+		idle = true;
 	var t = e.target;
 	if ((t.id != "pe") && (t.id != "px"))
 		{
@@ -344,6 +382,7 @@ function mouseOut(e)
 		}
 	if ((t.id == "pe") || (t.id == "px"))
 		{
+			temp.style.border = "2px solid #fff";
 			$("pe").style.display = "none";
 			$("px").style.display = "none";
 		}
@@ -352,6 +391,8 @@ function mouseOut(e)
 
 function enlarge_photo(e)
 {
+	e.preventDefault();
+	e.stopPropagation();
 	$("pe").style.display = "none";
 	$("px").style.display = "none";
 	var name = e.target.parentNode.id;
@@ -376,23 +417,35 @@ function enlarge_photo(e)
 		false);
 	if (! c.hasChildNodes())
 		c.appendChild(img);
+	
+	window.addEventListener("DOMMouseScroll", prevent, false);
+	window.addEventListener("mousewheel", prevent, false);
+	idle = false;
+}
+
+function prevent(e)
+{
+	e.preventDefault();
 }
 
 function edit_photo(e)
 {
+	idle = false;
 	var description = window.prompt("Please Enter the description for " + temp.name, "Enter description here...");
 	(description != null) && myLib.post({"action" : "photo_edit", "name" : temp.name, "description" : description}, function(json)
 		{
-			temp.title = json.description;
-			
-			console.log("Changed the descrription of " + temp.name + " to " + json.description);
+			var title = json.description.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&#39;/g, "\'").replace(/&amp;/g, "&");
+			temp.title = title;
+			console.log("Changed the descrription of " + temp.name + " to " + title);
 		});
 		
+	idle = true;
 	return false;
 }
 
 function remove_photo(e)
 {
+	idle = false;
 	window.confirm("Delete photo: " + temp.name + " \nConfirm?") && myLib.post({"action" : "photo_delete", "name" : temp.name}, function(json)
 		{
 			if (json == true)
@@ -405,6 +458,8 @@ function remove_photo(e)
 				console.log("Error: " + json);
 			}
 		});
+	
+	idle = true;
 		
 	return false;
 }

@@ -105,14 +105,22 @@ function photo_edit()
 	$name = $_POST['name'];
 	$description = $_POST['description'];
 	
+	$description_old = preg_replace("/&/", "&amp;", $description);
+	
+	$patterns = array();
+	$patterns[0] = "/</"; $patterns[1] = "/>/"; $patterns[2] = "/\"/"; $patterns[3] = "/\'/";
+	$replace = array();
+	$replace[0] = "&lt;"; $replace[1] = "&gt;"; $replace[2] = "&quot;"; $replace[3] = "&#39;";
+	
+	$description_new = preg_replace($patterns, $replace, $description_old);
 	global $db;
 	$db = db_connect("asg2");
 	
 	$q = $db->prepare("UPDATE photos SET description=(:description) WHERE name=(:name)");
-	if (! $q->execute(array(":description" => $description, ":name" => $name)))
+	if (! $q->execute(array(":description" => $description_new, ":name" => $name)))
 		throw new PDOException("ERROR UPDATE");
 	
-	return array("name" => $name, "description" => $description);
+	return array("name" => $name, "description" => $description_new);
 }
 
 
