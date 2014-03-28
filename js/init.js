@@ -273,7 +273,6 @@ function handleReaderLoadEnd(e)
 
 function display(json)
 {
-	console.log("display");
 	var li = [], img = [];
 	$("photoList").innerHTML = "";
 	for (var i = 0, pic; pic = json[i]; i++)
