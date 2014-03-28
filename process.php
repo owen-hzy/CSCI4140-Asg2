@@ -2,7 +2,7 @@
 error_reporting(E_ALL); ini_set('display_errors', 1);
 
 require_once 'db.inc.php';
-$upload_dir = (isset($_ENV['OPENSHIFT_DATA_DIR']) ? $_ENV['OPENSHIFT_DATA_DIR'] : "/var/www/asg2/data/");
+$upload_dir = (isset($_ENV['OPENSHIFT_DATA_DIR'])) ? $_ENV['OPENSHIFT_DATA_DIR'] : "/var/www/asg2/data/";
 
 function upload()
 {
@@ -29,7 +29,7 @@ function upload()
 		{
 			system("/usr/bin/convert " . $image_dir . " -resize 30% " . $upload_dir . "" . $thumbname);
 			global $db;
-			$db = db_connect("asg2");
+			$db = db_connect();
 			
 			if (check_duplicate($fn) == 0) {
 				$q = $db->prepare("INSERT INTO photos (name, thumb_name, size, upload_time) VALUES (:name, :thumb_name, :size, :upload_time)");
@@ -51,7 +51,7 @@ function upload()
 		else 
 		{
 			system('/bin/rm -f ' . $image_dir);
-			system('/bin/rm -f ' . $upload_dir . "" . $thumbname);
+			system('/bin/rm -f ' . $upload_dir . '' . $thumbname);
 			return "File type or size is not correct!";
 		}		
 	}
@@ -60,7 +60,7 @@ function upload()
 function check_duplicate($filename)
 {
 	global $db;
-	$db = db_connect("asg2");
+	$db = db_connect();
 	
 	$q = $db->prepare("SELECT COUNT(*) FROM photos WHERE name = (:name)");
 	$q->execute(array(":name" => $filename));
@@ -71,7 +71,7 @@ function check_duplicate($filename)
 function photo_fetchall()
 {
 	global $db;
-	$db = db_connect("asg2");
+	$db = db_connect();
 	
 	$q = $db->prepare("SELECT * FROM photos ORDER BY upload_time DESC");
 	if (! $q->execute())
@@ -88,7 +88,7 @@ function photo_delete()
 	$thumbname = $thumb . "_thumb." . $extension;
 	
 	global $db, $upload_dir;
-	$db = db_connect("asg2");
+	$db = db_connect();
 	
 	$q = $db->prepare("DELETE FROM photos WHERE name=(:name)");
 	if (! $q->execute(array(":name" => $name)))
@@ -114,13 +114,33 @@ function photo_edit()
 	
 	$description_new = preg_replace($patterns, $replace, $description_old);
 	global $db;
-	$db = db_connect("asg2");
+	$db = db_connect();
 	
 	$q = $db->prepare("UPDATE photos SET description=(:description) WHERE name=(:name)");
 	if (! $q->execute(array(":description" => $description_new, ":name" => $name)))
 		throw new PDOException("ERROR UPDATE");
 	
 	return array("name" => $name, "description" => $description_new);
+}
+
+function reinit()
+{
+	global $db, $upload_dir;
+	$db = db_connect();
+	
+	$q = $db->prepare("DROP TABLE IF EXISTS photos");
+	if (! $q->execute())
+		throw new PDOException("ERROR DROP TABLE");
+	
+	$q = $db->prepare("CREATE TABLE photos (name VARCHAR(50) NOT NULL PRIMARY KEY, thumb_name VARCHAR(50) NOT NULL, size INT NOT NULL, upload_time INT NOT NULL, description TEXT)");
+	if (! $q->execute())
+		throw new PDOException("ERROR CREATE TABLE");
+	
+	system('/bin/rm -rf ' . $upload_dir);
+	system('/bin/mkdir ' . $upload_dir);
+	system('/bin/chmod 750 ' . $upload_dir);
+	
+	return true;
 }
 
 
